@@ -4,13 +4,10 @@ import numpy as np
 cap = cv2.VideoCapture(0)
 
 while True:
-    # Görüntü yakala
     ret, frame = cap.read()
-
-    # HSV renk uzayına dönüştür
+    
     hsv_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
-    # Kırmızı renk aralığını belirle
     low_red = np.array([0, 50, 50])
     high_red = np.array([10, 255, 255])
     red_mask1 = cv2.inRange(hsv_frame, low_red, high_red)
@@ -19,26 +16,20 @@ while True:
     high_red = np.array([180, 255, 255])
     red_mask2 = cv2.inRange(hsv_frame, low_red, high_red)
 
-    # Kırmızı renk maskelemesi oluştur
     red_mask = cv2.addWeighted(red_mask1, 1.0, red_mask2, 1.0, 0.0)
 
-    # Kırmızı renk alanlarını bul
     contours, _ = cv2.findContours(red_mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
-    # Kırmızı renk alanlarını dikdörtgen kutulara al
     for cnt in contours:
         area = cv2.contourArea(cnt)
         if area > 500:
             x, y, w, h = cv2.boundingRect(cnt)
             cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 0, 255), 2)
 
-    # Görüntüyü göster
     cv2.imshow("Goruntu", frame)
 
-    # Çıkış için q tuşuna bas
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
 
-# Kaynakları serbest bırak
 cap.release()
 cv2.destroyAllWindows()
